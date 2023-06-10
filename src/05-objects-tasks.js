@@ -20,8 +20,13 @@
  *    console.log(r.height);      // => 20
  *    console.log(r.getArea());   // => 200
  */
-function Rectangle(/* width, height */) {
-  throw new Error('Not implemented');
+function Rectangle(width, height) {
+  this.width = width;
+  this.height = height;
+
+  this.getArea = function calcArea() {
+    return this.width * this.height;
+  };
 }
 
 
@@ -35,8 +40,8 @@ function Rectangle(/* width, height */) {
  *    [1,2,3]   =>  '[1,2,3]'
  *    { width: 10, height : 20 } => '{"height":10,"width":20}'
  */
-function getJSON(/* obj */) {
-  throw new Error('Not implemented');
+function getJSON(obj) {
+  return JSON.stringify(obj);
 }
 
 
@@ -51,8 +56,10 @@ function getJSON(/* obj */) {
  *    const r = fromJSON(Circle.prototype, '{"radius":10}');
  *
  */
-function fromJSON(/* proto, json */) {
-  throw new Error('Not implemented');
+function fromJSON(proto, json) {
+  const obj = JSON.parse(json);
+  Object.setPrototypeOf(obj, proto);
+  return obj;
 }
 
 
@@ -111,32 +118,70 @@ function fromJSON(/* proto, json */) {
  */
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  result: '',
+  orderCounter: 0,
+
+  element(value) {
+    const copy = { ...this };
+    this.error(1);
+    copy.orderCounter = 1;
+    copy.result = this.result + value;
+    return copy;
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    const copy = { ...this };
+    this.error(2);
+    copy.orderCounter = 2;
+    copy.result = `${this.result}#${value}`;
+    return copy;
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    const copy = { ...this };
+    this.error(3);
+    copy.orderCounter = 3;
+    copy.result = `${this.result}.${value}`;
+    return copy;
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    const copy = { ...this };
+    this.error(4);
+    copy.orderCounter = 4;
+    copy.result = `${this.result}[${value}]`;
+    return copy;
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    const copy = { ...this };
+    this.error(5);
+    copy.orderCounter = 5;
+    copy.result = `${this.result}:${value}`;
+    return copy;
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    const copy = { ...this };
+    this.error(6);
+    copy.orderCounter = 6;
+    copy.result = `${this.result}::${value}`;
+    return copy;
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    const copy = { ...this };
+    copy.result = `${selector1.result} ${combinator} ${selector2.result}`;
+    return copy;
+  },
+
+  stringify() {
+    return this.result;
+  },
+
+  error(order) {
+    if (this.orderCounter > order) throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    if (this.orderCounter === order && (order === 1 || order === 2 || order === 6)) throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
   },
 };
 
