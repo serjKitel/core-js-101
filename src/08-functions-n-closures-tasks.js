@@ -169,7 +169,7 @@ function retry(func, attempts) {
  *
  */
 function logger(func, logFunc) {
-  return function (...args) {
+  return function loggingFunction(...args) {
     const functionName = func.name;
     const argsString = JSON.stringify(args).slice(1, -1);
 
@@ -198,7 +198,7 @@ function logger(func, logFunc) {
  *   partialUsingArguments(fn, 'a','b','c','d')() => 'abcd'
  */
 function partialUsingArguments(fn, ...args1) {
-  return function (...args2) {
+  return function combinedFn(...args2) {
     return fn(...args1, ...args2);
   };
 }
@@ -224,7 +224,7 @@ function partialUsingArguments(fn, ...args1) {
 function getIdGeneratorFunction(startFrom) {
   let id = startFrom;
 
-  return function () {
+  return function idCounter() {
     const currentId = id;
     id += 1;
     return currentId;
